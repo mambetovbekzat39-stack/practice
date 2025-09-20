@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>задание 4</title>
+    <style>
+        h2 {
+            color: white;
+        }
+        body {
+            height: 100vh;
+            color: rgb(8, 3, 3);
+            background-image: url('https://i.pinimg.com/736x/ec/40/8a/ec408a16dbc6c701f64dcd0457e026e0.jpg');
+            background-size: cover;
+        }
+        details {
+            border: 0.5px solid orange;
+            border-radius: 4px;
+            padding: 0.5em 0.5em 0;
+            background-color: antiquewhite;
+            width: 400px;
+           
+        }
+          details:hover {
+            background-color: aquamarine;
+          }
+        summary {
+            font-weight: bold;
+            margin: -0.5em -0.5em 0;
+            padding: 0.5em;
+        }
+        details[open] summary {
+            border-bottom: 1px solid orange;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <section class="fag">
+        <h2>Частые вопросы</h2>
+        <details>
+            <summary>Что такое HTML?</summary>
+            <p>HTML — это язык разметки, с помощью которого создаются страницы в интернете.</p>
+        </details>
+        <details>
+            <summary>Что такое CSS?</summary>
+            <p>CSS — это язык стилей, который управляет внешним видом HTML-документов.</p>
+        </details>
+        <details>
+            <summary>Что такое JavaScript?</summary>
+            <p>JavaScript — это язык программирования, добавляющий интерактивность на сайты.</p>
+        </details>
+    </section>
+</body>
+</html>

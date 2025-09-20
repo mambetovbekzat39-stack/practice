@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>задание 3</title>
+  <style>
+    .hero {
+      height: 100vh; 
+      background-image: url('https://i.pinimg.com/736x/ec/40/8a/ec408a16dbc6c701f64dcd0457e026e0.jpg'); /* фон */
+      background-size: cover;
+      background-position: center;
+      display: flex;              
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+    }
+
+    h1 {
+      opacity: 0;                    
+      animation: fadeIn 2s forwards; 
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #007bff;
+      color: white;
+      opacity: 0;
+      animation: fadeInUp 2s forwards; 
+      animation-delay: 1s;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transition: background-color 0.3s;
+    }
+
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+  
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero">
+    <h1>Добро пожаловать!</h1>
+    <button>Узнать больше</button>
+  </section>
+
+</body>
+</html>
