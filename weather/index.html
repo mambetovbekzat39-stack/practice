@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NASA Weather — Просмотр погоды</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#03041c; --glass: rgba(255,255,255,0.06);
+      --accent:#00d0ff; --accent-2:#8b5cff; --text:#e7f0ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Roboto,system-ui,Arial; color:var(--text);
+      background: radial-gradient(ellipse at bottom, #0b1026 0%, #03041c 50%), linear-gradient(180deg,#00102166,transparent);
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="%2303041c"/></svg>');
+    }
+    .card{
+      width:100%; max-width:900px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:18px; padding:22px; box-shadow: 0 10px 30px rgba(2,6,23,0.7);
+      border:1px solid rgba(255,255,255,0.04);
+      display:grid; grid-template-columns: 1fr 360px; gap:20px; align-items:start;
+    }
+    header{grid-column:1/-1; display:flex; align-items:center; gap:14px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:700}
+    .logo span{font-size:20px;color:#021126}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;opacity:0.8;font-size:13px}
+
+    .controls{display:flex;gap:8px;margin-top:12px}
+    input[type="text"]{flex:1;padding:12px 14px;border-radius:10px;border:0;background:var(--glass);color:var(--text);outline:none}
+    button{padding:10px 12px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#021126;font-weight:600;cursor:pointer}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+
+    .main{
+      padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border-radius:12px;
+      min-height:260px; display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:10px;
+    }
+    .temp{font-size:54px;font-weight:700;line-height:1}
+    .meta{display:flex;gap:12px;font-size:14px;opacity:0.9}
+
+    .side{
+      padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border-radius:12px;min-height:260px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center
+    }
+    .icon{width:120px;height:120px;border-radius:12px;background:linear-gradient(135deg,#00112233,#11104444);display:flex;align-items:center;justify-content:center;font-size:48px}
+    .details{width:100%;display:flex;flex-direction:column;gap:6px}
+    .row{display:flex;justify-content:space-between;font-size:14px}
+
+    footer.small{grid-column:1/-1;text-align:center;font-size:12px;opacity:0.6;margin-top:8px}
+
+    /* small screens */
+    @media (max-width:820px){.card{grid-template-columns:1fr;}.side{order: -1}.temp{font-size:44px}}
+  </style>
+</head>
+<body>
+  <div class="card" role="application">
+    <header>
+      <div class="logo" aria-hidden><span>NS</span></div>
+      <div>
+        <h1>NASA Weather — просмотреть погоду</h1>
+        <p class="lead">Введите название города или используйте геолокацию — данные из Open‑Meteo (без API‑ключа).</p>
+        <div class="controls">
+          <input id="city" type="text" placeholder="Например: Bishkek, London, New York" />
+          <button id="search">Поиск</button>
+          <button id="gps" class="ghost">Использовать местоположение</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="main" aria-live="polite">
+      <div id="place">—</div>
+      <div class="temp" id="temp">—°C</div>
+      <div class="meta"><div id="desc">—</div><div id="time">—</div></div>
+      <div style="height:8px"></div>
+      <div class="details">
+        <div class="row"><span>Ветер</span><span id="wind">— м/с</span></div>
+        <div class="row"><span>Направление</span><span id="winddir">—</span></div>
+        <div class="row"><span>Давление</span><span id="press">— hPa</span></div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <div class="icon" id="icon">🪐</div>
+      <div style="width:100%">
+        <div class="row"><strong>Осадки</strong><span id="precip">—</span></div>
+        <div class="row"><strong>Влажность</strong><span id="humidity">—</span></div>
+        <div class="row"><strong>Источник</strong><span>Open‑Meteo</span></div>
+      </div>
+    </aside>
+
+    <footer class="small">Демо: NASA-themed UI. Код открыт — можно править. Данные обновляются при каждом запросе.</footer>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const searchBtn = $('search');
+    const gpsBtn = $('gps');
+    const cityInput = $('city');
+
+    searchBtn.addEventListener('click', ()=> queryByName(cityInput.value.trim()));
+    cityInput.addEventListener('keydown', e=>{ if(e.key==='Enter') queryByName(cityInput.value.trim()) });
+    gpsBtn.addEventListener('click', ()=>{
+      if(!navigator.geolocation) return alert('Геолокация не поддерживается в этом браузере');
+      navigator.geolocation.getCurrentPosition(p=> fetchWeather(p.coords.latitude, p.coords.longitude, 'Текущее местоположение'), err=> alert('Не удалось получить позицию: '+err.message))
+    });
+
+    async function queryByName(name){
+      if(!name) return alert('Введите название города');
+      setStatus('Идёт поиск...');
+      try{
+        const geo = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=5&language=ru`)
+          .then(r=>r.json());
+        if(!geo.results || geo.results.length===0) return setStatus('Город не найден');
+        const res = geo.results[0];
+        fetchWeather(res.latitude, res.longitude, `${res.name}${res.country ? ', '+res.country : ''}`);
+      }catch(e){ setStatus('Ошибка геокодирования'); console.error(e) }
+    }
+
+    async function fetchWeather(lat, lon, placeName=''){
+      setStatus('Загрузка погоды...');
+      try{
+        // current_weather provides temperature, windspeed, winddirection
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m,pressure_msl,precipitation&timezone=auto`;
+        const data = await fetch(url).then(r=>r.json());
+        if(!data || !data.current_weather) return setStatus('Нет данных о погоде');
+
+        const cw = data.current_weather;
+        const temp = cw.temperature;
+        const wind = cw.windspeed;
+        const winddir = cw.winddirection;
+        const time = cw.time;
+
+        // For humidity/pressure/precipitation we try to find nearest hourly value
+        let humidity = '—', pressure='—', precip='—';
+        if(data.hourly){
+          const tIndex = data.hourly.time ? data.hourly.time.indexOf(time) : -1;
+          if(tIndex>=0){
+            if(data.hourly.relativehumidity_2m) humidity = data.hourly.relativehumidity_2m[tIndex] + ' %';
+            if(data.hourly.pressure_msl) pressure = data.hourly.pressure_msl[tIndex] + ' hPa';
+            if(data.hourly.precipitation) precip = data.hourly.precipitation[tIndex] + ' mm';
+          }
+        }
+
+        // update UI
+        $('place').textContent = placeName || `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+        $('temp').textContent = Math.round(temp) + '°C';
+        const desc = weatherCodeToText(cw.weathercode);
+        $('desc').textContent = desc;
+        $('time').textContent = new Date(time).toLocaleString();
+        $('wind').textContent = wind + ' м/с';
+        $('winddir').textContent = Math.round(winddir) + '°';
+        $('press').textContent = pressure;
+        $('precip').textContent = precip;
+        $('humidity').textContent = humidity;
+        $('icon').textContent = weatherCodeToIcon(cw.weathercode);
+      }catch(e){ console.error(e); setStatus('Ошибка при запросе погоды') }
+    }
+
+    function setStatus(text){
+      $('place').textContent = text;
+      $('temp').textContent = '—°C';
+      $('desc').textContent = '';
+      $('time').textContent = '';
+      $('wind').textContent = '—';
+      $('winddir').textContent = '—';
+      $('press').textContent = '—';
+      $('precip').textContent = '—';
+      $('humidity').textContent = '—';
+      $('icon').textContent = '🪐';
+    }
+
+    // Minimal mapping of Open-Meteo weather codes to text and simple emoji icons
+    function weatherCodeToText(code){
+      const map = {
+        0: 'Ясно', 1: 'Малооблачно', 2: 'Переменная облачность', 3: 'Пасмурно',
+        45: 'Туман', 48: 'Пыль/изморозь',
+        51: 'Лёгкая морось', 53: 'Умеренная морось', 55: 'Сильная морось',
+        61: 'Небольшой дождь', 63: 'Дождь', 65: 'Сильный дождь',
+        71: 'Снег', 73: 'Снегопад', 75: 'Сильный снег',
+        80: 'Ливни', 81: 'Сильные ливни', 82: 'Порывистые ливни',
+        95: 'Гроза', 99: 'Град'
+      };
+      return map[code] || ('Код '+code);
+    }
+    function weatherCodeToIcon(code){
+      if(code===0) return '☀️';
+      if(code<=3) return '⛅';
+      if([45,48].includes(code)) return '🌫️';
+      if([51,53,55,61,63,65,80,81,82].includes(code)) return '🌧️';
+      if([71,73,75].includes(code)) return '❄️';
+      if([95,99].includes(code)) return '⛈️';
+      return '🪐';
+    }
+
+    // quick demo: show Bishkek on load
+    queryByName('Bishkek');
+  </script>
+</body>
+</html>
