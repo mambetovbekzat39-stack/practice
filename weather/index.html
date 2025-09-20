@@ -89,7 +89,7 @@
       background: rgba(255, 255, 255, 0.1);
       color: white;
       padding-left: 40px;
-      font-size: 16px; /* Увеличиваем для удобства на мобильных */
+      font-size: 16px; 
     }
     
     .search-box i {
@@ -251,7 +251,7 @@
       background: #2a8381;
     }
     
-    /* Стили для мобильной навигации */
+
     .mobile-tabs {
       position: fixed;
       bottom: 0;
@@ -340,7 +340,7 @@
       }
     }
     
-    /* Улучшение для очень высоких экранов */
+  
     @media (min-height: 800px) {
       .sidebar {
         max-height: 40vh;
@@ -367,7 +367,7 @@
       </div>
       
       <div class="cities-list" id="cities-list">
-        <!-- Список будет заполнен через JavaScript -->
+       
       </div>
       <div class="toggle-sidebar">
         <i class="fas fa-chevron-up"></i>
@@ -414,17 +414,17 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // --- Настройка карты ---
+ 
     const map = L.map('map').setView([41.5, 74.5], 7);
     
-    // Добавляем слой карты
+  
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
     
-    // --- Места Кыргызстана ---
+   
     const places = [
-      // Города
+   
      { 
   name: "Орловка", 
   lat: 42.7424329, 
@@ -561,7 +561,7 @@
       }
     ];
     
-    // Цвета маркеров по типам
+ 
     const typeColors = {
       'city': '#3498db',
       'nature': '#2ecc71',
@@ -569,7 +569,7 @@
       'mountain': '#e74c3c'
     };
     
-    // Иконки для маркеров
+    
     const typeIcons = {
       'city': 'fa-city',
       'nature': 'fa-tree',
@@ -577,11 +577,11 @@
       'mountain': 'fa-mountain'
     };
     
-    // Создаем маркеры для всех мест
+    
     const markers = [];
     
     places.forEach(place => {
-      // Создаем кастомную иконку для маркера
+    
       const icon = L.divIcon({
         className: 'custom-icon',
         html: `<div style="background-color: ${typeColors[place.type]}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white;">
@@ -593,7 +593,7 @@
       
       const marker = L.marker([place.lat, place.lon], { icon: icon }).addTo(map);
       
-      // Добавляем обработчик клика на маркер
+ 
       marker.on("click", async () => {
         const weather = await getWeather(place);
         marker.bindPopup(`
@@ -610,7 +610,7 @@
         `).openPopup();
       });
       
-      // Сохраняем маркер с дополнительной информацией
+     
       markers.push({
         marker: marker,
         name: place.name,
@@ -620,7 +620,7 @@
       });
     });
     
-    // --- Функция загрузки погоды (wttr.in, без ключа) ---
+  
     async function getWeather(place) {
       const url = `https://wttr.in/${place.name}?format=j1`;
       try {
@@ -634,7 +634,7 @@
       }
     }
     
-    // --- Заполняем список городов в сайдбаре ---
+ 
     const citiesList = document.getElementById('cities-list');
     
     places.forEach(place => {
