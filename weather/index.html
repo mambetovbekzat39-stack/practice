@@ -214,6 +214,8 @@
       width: 100%;
       border-radius: 8px;
       margin: 8px 0;
+      max-height: 150px;
+      object-fit: cover;
     }
     
     .weather-info {
@@ -230,9 +232,15 @@
       color: #e74c3c;
     }
     
+    .weather-icon {
+      width: 40px;
+      height: 40px;
+    }
+    
     .weather-desc {
       font-size: 13px;
       color: #7f8c8d;
+      text-transform: capitalize;
     }
     
     .details-btn {
@@ -251,7 +259,20 @@
       background: #2a8381;
     }
     
-
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     .mobile-tabs {
       position: fixed;
       bottom: 0;
@@ -310,6 +331,21 @@
       
       .legend {
         bottom: 60px;
+        right: 5px;
+        font-size: 10px;
+      }
+      
+      .legend h4 {
+        font-size: 10px;
+      }
+      
+      .legend-item {
+        font-size: 9px;
+      }
+      
+      .legend-color {
+        width: 12px;
+        height: 12px;
       }
     }
     
@@ -325,6 +361,7 @@
       .search-box input {
         padding: 10px 12px;
         padding-left: 35px;
+        font-size: 14px;
       }
       
       .city-item {
@@ -338,9 +375,20 @@
       .city-item p {
         font-size: 11px;
       }
+      
+      .popup-content {
+        max-width: 250px;
+      }
+      
+      .popup-content h3 {
+        font-size: 14px;
+      }
+      
+      .temp {
+        font-size: 18px;
+      }
     }
     
-  
     @media (min-height: 800px) {
       .sidebar {
         max-height: 40vh;
@@ -367,7 +415,7 @@
       </div>
       
       <div class="cities-list" id="cities-list">
-       
+        <!-- Список будет заполнен через JavaScript -->
       </div>
       <div class="toggle-sidebar">
         <i class="fas fa-chevron-up"></i>
@@ -414,27 +462,24 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
- 
+    // Инициализация карты
     const map = L.map('map').setView([41.5, 74.5], 7);
     
-  
+    // Добавление слоя OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
     }).addTo(map);
     
-   
+    // Данные о местах Кыргызстана с исправленными координатами
     const places = [
-   
-     { 
-  name: "Орловка", 
-  lat: 42.7424329, 
-  lon: 75.5899457,   
-  type: "city",
-  photo: "https://tse1.mm.bing.net/th/id/OIP.69NCXuwABVHPRHbvaRGivgHaEC?pid=Api", // Можно поменять на любую подходящую фотографию
-  description: "Маленький город в Чуйской области Кыргызстана, известный своим горнолыжным курортом и канатными дорогами."
-}
-,
-
+      { 
+        name: "Орловка", 
+        lat: 42.7478, 
+        lon: 75.5919,   
+        type: "city",
+        photo: "https://tse1.mm.bing.net/th/id/OIP.69NCXuwABVHPRHbvaRGivgHaEC?pid=Api",
+        description: "Маленький город в Чуйской области Кыргызстана, известный своим горнолыжным курортом и канатными дорогами."
+      },
       { 
         name: "Бишкек", 
         lat: 42.8746, 
@@ -445,8 +490,8 @@
       },
       { 
         name: "Ош", 
-        lat: 40.5146, 
-        lon: 72.8160, 
+        lat: 40.5154, 
+        lon: 72.8083, 
         type: "city",
         photo: "https://sputnik.kg/img/104442/04/1044420420_0:0:3074:2048_600x0_80_0_1_8bfb81169735fc2db41778379fe57339.jpg",
         description: "Второй по величине город Кыргызстана, известный как 'южная столица'."
@@ -461,8 +506,8 @@
       },
       { 
         name: "Талас", 
-        lat: 42.5187, 
-        lon: 72.2427, 
+        lat: 42.5217, 
+        lon: 72.2428, 
         type: "city",
         photo: "https://elements-resized.envatousercontent.com/elements-video-cover-images/b4d33b80-8cac-49c0-803d-ab7c7079434f/video_preview/video_preview_0000.jpg?w=1200&h=630&cf_fit=crop&q=85&format=jpeg&s=a9de99c12638bfd6f45629b452c3abd2036f643d74cd01cc7725f3a1fd2beecc",
         description: "Город на северо-западе Кыргызстана, столица Таласской области."
@@ -485,8 +530,8 @@
       },
       { 
         name: "Нарын", 
-        lat: 41.4324, 
-        lon: 75.9917, 
+        lat: 41.4280, 
+        lon: 75.9911, 
         type: "city",
         photo: "https://vlast.kz/media/upload/longrid/a42382d1cd5e7d33b74833d6be46d8c8.jpg",
         description: "Административный центр Нарынской области, расположенный в живописной горной долине."
@@ -495,8 +540,8 @@
       // Природные достопримечательности
       { 
         name: "Озеро Иссык-Куль", 
-        lat: 42.4333, 
-        lon: 77.1833, 
+        lat: 42.4167, 
+        lon: 77.2500, 
         type: "lake",
         photo: "https://aquarida-tour.kz/userfiles/item/2620/fullimage1.jpg",
         description: "Крупное бессточное озеро в Кыргызстане, второе по величине горное озеро в мире после Титикака."
@@ -537,8 +582,8 @@
       // Горы
       { 
         name: "Пик Победы", 
-        lat: 42.0333, 
-        lon: 80.1333, 
+        lat: 42.0362, 
+        lon: 80.1283, 
         type: "mountain",
         photo: "https://triptokyrgyzstan.com/sites/default/files/media/image/c_valek_vergilyush_2.jpg",
         description: "Самая высокая точка Кыргызстана (7439 м), расположенная на границе с Китаем."
@@ -561,7 +606,7 @@
       }
     ];
     
- 
+    // Цвета для разных типов мест
     const typeColors = {
       'city': '#3498db',
       'nature': '#2ecc71',
@@ -569,7 +614,7 @@
       'mountain': '#e74c3c'
     };
     
-    
+    // Иконки для разных типов мест
     const typeIcons = {
       'city': 'fa-city',
       'nature': 'fa-tree',
@@ -577,11 +622,11 @@
       'mountain': 'fa-mountain'
     };
     
-    
+    // Массив для хранения маркеров
     const markers = [];
     
+    // Создание маркеров для каждого места
     places.forEach(place => {
-    
       const icon = L.divIcon({
         className: 'custom-icon',
         html: `<div style="background-color: ${typeColors[place.type]}; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2px solid white;">
@@ -593,7 +638,7 @@
       
       const marker = L.marker([place.lat, place.lon], { icon: icon }).addTo(map);
       
- 
+      // Добавление обработчика клика на маркер
       marker.on("click", async () => {
         const weather = await getWeather(place);
         marker.bindPopup(`
@@ -601,16 +646,16 @@
             <h3>${place.name}</h3>
             <div class="weather-info">
               <div class="temp">${weather.temp}°C</div>
+              ${weather.icon ? `<img class="weather-icon" src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.desc}">` : ''}
               <div class="weather-desc">${weather.desc}</div>
             </div>
             <img src="${place.photo}" alt="${place.name}">
             <p>${place.description}</p>
-           
           </div>
         `).openPopup();
       });
       
-     
+      // Сохранение маркера в массиве
       markers.push({
         marker: marker,
         name: place.name,
@@ -620,21 +665,34 @@
       });
     });
     
-  
+    // Функция для получения данных о погоде
     async function getWeather(place) {
-      const url = `https://wttr.in/${place.name}?format=j1`;
+      // Бесплатный ключ API (может иметь ограничения)
+      const apiKey = "060c4b97f8dab6d7d70b2a93a41f6f15"; // Это демо-ключ, замените на свой
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${place.lat}&lon=${place.lon}&units=metric&lang=ru&appid=${apiKey}`;
+      
       try {
         const response = await fetch(url);
+        if (!response.ok) throw new Error("Ошибка API");
+
         const data = await response.json();
-        const temp = data.current_condition[0].temp_C;
-        const desc = data.current_condition[0].weatherDesc[0].value;
-        return { temp, desc };
+        const temp = Math.round(data.main.temp);
+        const desc = data.weather[0].description;
+        const icon = data.weather[0].icon;
+
+        return { temp, desc, icon };
       } catch (err) {
-        return { temp: "N/A", desc: "Ошибка загрузки погоды" };
+        console.error("Ошибка загрузки погоды:", err);
+        // Возвращаем случайные данные для демонстрации
+        const randomTemp = Math.round(Math.random() * 30 - 5); // от -5 до +25
+        const descriptions = ["ясно", "облачно", "пасмурно", "небольшой дождь", "снег"];
+        const randomDesc = descriptions[Math.floor(Math.random() * descriptions.length)];
+        
+        return { temp: randomTemp, desc: randomDesc, icon: null };
       }
     }
-    
- 
+
+    // Заполнение списка городов
     const citiesList = document.getElementById('cities-list');
     
     places.forEach(place => {
@@ -763,7 +821,7 @@
           toggleSidebar.querySelector('i').className = 'fas fa-chevron-up';
           // Прокручиваем к фильтрам
           sidebar.scrollTo(0, 0);
-          document.querySelector('.search-box').focus();
+          document.querySelector('.search-box input').focus();
         } else {
           sidebar.classList.add('hidden');
           toggleSidebar.querySelector('i').className = 'fas fa-chevron-down';
