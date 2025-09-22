@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kahoot Викторина</title>
+<style>
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                url('https://www.issykkul.biz/portals/0/issyyk-kul6-gornaja-jemchujina-kirgizii-3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    line-height: 1.5;
+  }
+
+  #quiz-container {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 500px;
+    overflow: hidden;
+    position: relative;
+    margin: 10px;
+  }
+
+  #quiz-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+    z-index: 1;
+  }
+
+  #quiz-header {
+    padding: 20px 20px 15px;
+    background: linear-gradient(135deg, #3498db, #2c3e50);
+    color: white;
+    text-align: center;
+    position: relative;
+  }
+
+  h1 { 
+    font-size: 26px; 
+    margin-bottom: 5px; 
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+
+  #player-display {
+    font-size: 16px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+  }
+
+  .score-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .progress-container {
+    width: 70%;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71, #1abc9c);
+    width: 0%;
+    transition: width 0.5s ease;
+    border-radius: 5px;
+  }
+
+  #quiz-content { 
+    padding: 20px; 
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .question {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .options { 
+    display: grid; 
+    grid-template-columns: 1fr; 
+    gap: 15px; 
+    margin-bottom: 20px; 
+  }
+
+  .option-btn {
+    padding: 18px 15px; 
+    font-size: 18px; 
+    border: none; 
+    border-radius: 15px;
+    cursor: pointer; 
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white; 
+    font-weight: 600; 
+    transition: all 0.3s ease; 
+    text-align: left;
+    position: relative; 
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.7s;
+  }
+
+  .option-btn:hover::before {
+    left: 100%;
+  }
+
+  .option-btn:active {
+    transform: scale(0.98);
+  }
+
+  .option-btn.correct { 
+    background: linear-gradient(135deg, #2ecc71, #27ae60); 
+    animation: pulse 0.5s;
+  }
+
+  .option-btn.incorrect { 
+    background: linear-gradient(135deg, #e74c3c, #c0392b); 
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+
+  #next-btn, .start-btn, .restart-btn {
+    width: 100%; 
+    padding: 18px; 
+    font-size: 20px; 
+    border: none; 
+    border-radius: 15px;
+    cursor: pointer; 
+    font-weight: 700; 
+    transition: all 0.3s ease;
+    margin-top: 10px; 
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60px;
+  }
+
+  #next-btn:active, .start-btn:active, .restart-btn:active {
+    transform: scale(0.98);
+  }
+
+  #next-btn { 
+    background: linear-gradient(135deg, #9b59b6, #8e44ad); 
+    display: none; 
+  }
+  
+  .start-btn { 
+    background: linear-gradient(135deg, #27ae60, #2ecc71); 
+  }
+  
+  .restart-btn { 
+    background: linear-gradient(135deg, #e67e22, #d35400); 
+  }
+
+  .results { 
+    text-align: center; 
+    padding: 10px; 
+  }
+  
+  .final-score { 
+    font-size: 28px; 
+    font-weight: 700; 
+    margin-bottom: 15px; 
+    color: #2c3e50;
+  }
+  
+  .score-message { 
+    font-size: 20px; 
+    color: #555; 
+    margin-bottom: 25px;
+    line-height: 1.4;
+  }
+
+  /* Стартовый экран */
+  #start-screen { 
+    text-align: center; 
+    padding: 10px; 
+  }
+  
+  #start-screen h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+  }
+  
+  #player-name { 
+    width: 100%; 
+    padding: 18px; 
+    margin: 20px 0; 
+    border-radius: 12px; 
+    border: 2px solid #ddd; 
+    font-size: 18px; 
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+  
+  #player-name:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+
+  /* Анимация появления */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  /* Адаптация для очень маленьких экранов */
+  @media (max-width: 400px) {
+    #quiz-header {
+      padding: 15px 15px 10px;
+    }
+    
+    h1 {
+      font-size: 22px;
+    }
+    
+    .question {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .option-btn {
+      padding: 16px 12px;
+      font-size: 16px;
+      min-height: 65px;
+    }
+    
+    #next-btn, .start-btn, .restart-btn {
+      padding: 16px;
+      font-size: 18px;
+      min-height: 55px;
+    }
+    
+    .final-score {
+      font-size: 24px;
+    }
+    
+    .score-message {
+      font-size: 18px;
+    }
+    
+    #player-name {
+      padding: 16px;
+      font-size: 16px;
+    }
+  }
+
+  /* Адаптация для планшетов и больших телефонов */
+  @media (min-width: 768px) {
+    .options {
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+  }
+
+  /* Портретная ориентация */
+  @media (max-height: 700px) and (orientation: portrait) {
+    #quiz-content {
+      min-height: 250px;
+      padding: 15px;
+    }
+    
+    .question {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .option-btn {
+      padding: 14px 12px;
+      min-height: 60px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="quiz-container">
+  <div id="quiz-header">
+    <h1>Kahoot Викторина</h1>
+    <div id="player-display"></div>
+    <div class="score-progress" id="progress-info" style="display: none;">
+      <span id="score">Упай: 0</span>
+      <span id="question-count">Суроо 1/10</span>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+  
+  <div id="quiz-content">
+    <!-- Стартовый экран -->
+    <div id="start-screen" class="fade-in">
+      <h2>Сураныч, атыңызды жазыныз!</h2>
+      <input type="text" id="player-name" placeholder="Сиздин атыныз" maxlength="20">
+      <button class="start-btn" id="start-btn">Оюнду баштоо</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const quizData = [
+  { question: "Кыргыз тили мамлекеттик тил катары качан кабыл алынган?", options: ["А) 1988-ж.", "Б) 1989-ж.", "В) 1991-ж.", "Г) 1993-ж."], answer: "Б) 1989-ж." },
+  { question: "Кыргыз тили күнүнүн негизги максаты эмнеде?", options: ["А) Спортту өнүктүрүү", "Б) Кыргыз тилин сактоо жана даңазалоо", "В) Экономиканы чыңдоо", "Г) Табиятты коргоо"], answer: "Б) Кыргыз тилин сактоо жана даңазалоо" },
+  { question: "Кыргыз Республикасынын биринчи Президенти ким болгон?", options: ["А) Курманбек Бакиев", "Б) Алмазбек Атамбаев", "В) Садыр Жапаров", "Г) Аскар Акаев"], answer: "Г) Аскар Акаев" },
+  { question: "Кыргыз тилинде 'жакшы сөздүн жарымы – жарык' деген макал эмнени билдирет?", options: ["А) Жакшы сөздүн күчү чоң.", "Б) Сөздү көп айтса болот.", "В) Макалды унутуу оңой.", "Г) Сөздү тез айтууга болот."], answer: "А) Жакшы сөздүн күчү чоң." },
+  { question: "Ч.Айтматовдун сөзү боюнча, адамдын эң күчтүү куралы эмнеде?", options: ["А) Билим", "Б) Махабат", "В) Семья", "Г) Работа"], answer: "Б) Махабат" },
+  { question: "Программист негизинен кайсы тилдер менен иштейт?", options: ["А) Англис тили менен кыргыз тили", "Б) Программалоо тилдери (Python, Java, C++ ж.б.)", "В) Француз тили менен испан тили", "Г) Орус тили менен казак тили"], answer: "Б) Программалоо тилдери (Python, Java, C++ ж.б.)" },
+  { question: "Программисттин негизги куралы кайсы?", options: ["А) Клавиатура жана компьютер", "Б) Балка менен мык", "В) Карандаш менен китеп", "Г) Камера менен микрофон"], answer: "А) Клавиатура жана компьютер" },
+  { question: "Программисттер колдонмо жана сайттарды түзүүдө эмнени колдонушат?", options: ["А) Код жазуу", "Б) Сүрөт тартуу", "В) Ыр жазуу", "Г) Чатыр жабуу"], answer: "А) Код жазуу" },
+  { question: "Веб-разработчик ким?", options: ["A) Веб-сайттарды түзгөн адис", "Б) Компьютер оюндарын иштеп чыгуучү", "В) Электр жабдууларын оңдоочу", "Г) Медицина илимдерин изилдеген адис"], answer: "A) Веб-сайттарды түзгөн адис" },
+  { question: "Веб-разработчиктин негизги максаты эмнеде?", options: ["A) Веб-сайттарды иштеп чыгуу жана функцияларын камсыз кылуу", "Б) Компьютердик оюндарды жаратуу", "В) Кино тартуу", "Г) Автоунааларды оңдоо"], answer: "A) Веб-сайттарды иштеп чыгуу жана функцияларын камсыз кылуу" },
+];
+
+let currentQuestion = 0;
+let score = 0;
+let playerName = "";
+
+// Элементы интерфейса
+const questionEl = document.createElement("div");
+questionEl.classList.add("question");
+const optionsEl = document.createElement("div");
+optionsEl.classList.add("options");
+const nextBtn = document.createElement("button");
+nextBtn.id = "next-btn";
+nextBtn.textContent = "Кийинки суроо";
+
+const scoreEl = document.getElementById("score");
+const questionCountEl = document.getElementById("question-count");
+const progressBarEl = document.getElementById("progress-bar");
+const quizContentEl = document.getElementById("quiz-content");
+const progressInfo = document.getElementById("progress-info");
+const playerDisplay = document.getElementById("player-display");
+
+// Обработчик начала игры
+document.getElementById("start-btn").addEventListener("click", startGame);
+document.getElementById("player-name").addEventListener("keypress", function(e) {
+  if (e.key === 'Enter') {
+    startGame();
+  }
+});
+
+function startGame() {
+  const input = document.getElementById("player-name");
+  const name = input.value.trim();
+  
+  if (name === "") {
+    alert("Сураныч, атыңызды жазыныз!");
+    input.focus();
+    return;
+  }
+  
+  playerName = name;
+  playerDisplay.textContent = `Оюнчу: ${playerName}`;
+  startQuiz();
+}
+
+function startQuiz() {
+  quizContentEl.innerHTML = "";
+  quizContentEl.appendChild(questionEl);
+  quizContentEl.appendChild(optionsEl);
+  quizContentEl.appendChild(nextBtn);
+  progressInfo.style.display = "flex";
+  
+  // Анимация появления
+  questionEl.classList.add("fade-in");
+  optionsEl.classList.add("fade-in");
+  
+  loadQuestion();
+}
+
+function loadQuestion() {
+  nextBtn.style.display = "none";
+  const q = quizData[currentQuestion];
+  questionEl.textContent = q.question;
+  optionsEl.innerHTML = "";
+  
+  // Обновляем информацию о прогрессе
+  questionCountEl.textContent = `Суроо ${currentQuestion + 1}/${quizData.length}`;
+  progressBarEl.style.width = `${(currentQuestion / quizData.length) * 100}%`;
+  
+  // Создаем кнопки с вариантами ответов
+  q.options.forEach((option, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.classList.add("option-btn", "fade-in");
+    btn.style.animationDelay = `${index * 0.1}s`;
+    btn.addEventListener("click", () => selectAnswer(option));
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(selectedOption) {
+  const correctAnswer = quizData[currentQuestion].answer;
+  const buttons = Array.from(optionsEl.children);
+  
+  // Отключаем все кнопки после выбора ответа
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.pointerEvents = "none";
+    
+    // Подсвечиваем правильный и неправильные ответы
+    if (btn.textContent === correctAnswer) {
+      btn.classList.add("correct");
+    } else if (btn.textContent === selectedOption) {
+      btn.classList.add("incorrect");
+    }
+  });
+  
+  // Увеличиваем счет, если ответ правильный
+  if (selectedOption === correctAnswer) {
+    score++;
+    scoreEl.textContent = `Упай: ${score}`;
+  }
+  
+  // Показываем кнопку "Следующий вопрос"
+  nextBtn.style.display = "block";
+  nextBtn.classList.add("fade-in");
+}
+
+nextBtn.addEventListener("click", () => {
+  currentQuestion++;
+  if (currentQuestion < quizData.length) {
+    loadQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults() {
+  progressBarEl.style.width = "100%";
+  quizContentEl.innerHTML = `
+    <div class="results fade-in">
+      <div class="final-score">Рахмат, ${playerName}!</div>
+      <div class="final-score">Сиздин жыйынтыгыныз: ${score}/${quizData.length}</div>
+      <div class="score-message">${getResultMessage()}</div>
+      <button class="restart-btn" id="restart-btn">Кайра баштоо</button>
+    </div>
+  `;
+  document.getElementById("restart-btn").addEventListener("click", restartQuiz);
+}
+
+function getResultMessage() {
+  const percentage = (score / quizData.length) * 100;
+  if (percentage >= 90) return "Эң сонун натыйжа! Сиз чындагы экспертсиз!";
+  if (percentage >= 70) return "Жакшы натыйжа! Сиз бул теманы жакшы билесиз!";
+  if (percentage >= 50) return "Жаман эмес, бирок жакшыраак боло аласыз.";
+  return "Кайра аракет кылыныз! Дагы бир жолу сынап көрүңүз!";
+}
+
+function restartQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  scoreEl.textContent = "Упай: 0";
+  progressInfo.style.display = "none";
+  playerDisplay.textContent = "";
+  
+  quizContentEl.innerHTML = `
+    <div id="start-screen" class="fade-in">
+      <h2>Сураныч, атыңызды жазыныз!</h2>
+      <input type="text" id="player-name" placeholder="Сиздин атыныз" maxlength="20">
+      <button class="start-btn" id="start-btn">Оюнду баштоо</button>
+    </div>
+  `;
+  
+  // Перепривязываем обработчики событий
+  document.getElementById("start-btn").addEventListener("click", startGame);
+  document.getElementById("player-name").addEventListener("keypress", function(e) {
+    if (e.key === 'Enter') {
+      startGame();
+    }
+  });
+  
+  // Фокус на поле ввода
+  document.getElementById("player-name").focus();
+}
+</script>
+</body>
+</html>
