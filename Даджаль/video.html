@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видео о Даджале - Четыре испытания</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0a0a14;
+            --light-bg: #f8f5e9;
+            --dark-text: #e9e2d0;
+            --light-text: #2c2c2c;
+            --accent: #c9a96e;
+            --accent-light: #d4b887;
+            --danger: #b40000;
+            --danger-light: #d9534f;
+            --primary: #2c5aa0;
+            --primary-light: #3a6bc5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Scheherazade New', serif;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            flex: 1;
+        }
+
+        header {
+            padding: 1.5rem 0;
+            text-align: center;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(180, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-family: 'Amiri', serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            margin-bottom: 0.5rem;
+            color: var(--danger);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: transparent;
+            color: var(--dark-text);
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(180, 0, 0, 0.3);
+            font-family: inherit;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-top: 1rem;
+        }
+
+        .back-btn:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+        }
+
+        .video-section {
+            padding: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .video-title {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--danger);
+            position: relative;
+        }
+
+        .video-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: var(--danger);
+            margin: 0.5rem auto;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(180, 0, 0, 0.3);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            gap: 15px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--dark-text);
+        }
+
+        .volume-slider {
+            width: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--danger);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        }
+
+        .btn:hover {
+            background-color: var(--danger-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(180, 0, 0, 0.3);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+
+        .transcript-section {
+            max-width: 900px;
+            margin: 0 auto 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+
+        .transcript-title {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            margin-bottom: 1.5rem;
+            color: var(--danger);
+            text-align: center;
+        }
+
+        .transcript-content {
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            line-height: 1.8;
+        }
+
+        .transcript-item {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .transcript-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .timestamp {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .timestamp:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .transcript-text {
+            margin-bottom: 0.5rem;
+        }
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            text-align: right;
+            margin: 1.5rem 0;
+            color: var(--danger);
+            line-height: 1.8;
+            padding: 1.2rem;
+            background: rgba(180, 0, 0, 0.05);
+            border-radius: 8px;
+            border-right: 3px solid var(--danger);
+        }
+
+        .translation {
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+
+        .warning-box {
+            background: rgba(180, 0, 0, 0.1);
+            border: 2px solid rgba(180, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-title {
+            color: var(--danger);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            text-align: center;
+        }
+
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.2rem;
+            margin: 2rem 0;
+        }
+
+        .point-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-top: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .point-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .point-card h3 {
+            color: var(--danger);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(180, 0, 0, 0.3);
+            background: rgba(10, 10, 20, 0.9);
+        }
+
+        /* Адаптивные стили */
+        @media (max-width: 768px) {
+            .video-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .transcript-section {
+                padding: 1.5rem;
+            }
+            
+            .transcript-item {
+                padding: 1.2rem;
+            }
+            
+            .key-points {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-section {
+                padding: 1.5rem 0;
+            }
+            
+            .transcript-section {
+                padding: 1.2rem;
+            }
+            
+            .transcript-item {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">الدَّجَّال</div>
+            <div class="subtitle">Четыре испытания Даджаля</div>
+            <a href="index.html" class="back-btn">← Назад к описанию</a>
+        </header>
+        
+        <section class="video-section">
+            <h1 class="video-title">Четыре испытания Даджаля</h1>
+            
+            <div class="video-container">
+                <!-- Замените src на путь к вашему видео -->
+                <video id="dajjalVideo" controls poster="./video-poster.jpg">
+                    <source src="./oIr2cQEIYQBIGHAFBuBZIEY3SUPRnEi9O6Bia.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+            </div>
+            
+            <div class="video-controls">
+                <div class="volume-control">
+                    <span>Громкость:</span>
+                    <input type="range" min="0" max="1" step="0.1" value="0.7" class="volume-slider" id="volumeSlider">
+                </div>
+                <button class="btn" id="fullscreenBtn">Полный экран</button>
+                <button class="btn btn-primary" id="captionsBtn">Субтитры</button>
+            </div>
+        </section>
+        
+        <section class="transcript-section">
+            <h2 class="transcript-title">Текст и описание видео</h2>
+            
+            <div class="transcript-content">
+                <p>В этом видео подробно рассказывается о четырех испытаниях, которые принесет с собой Даджаль, и как мусульмане должны подготовиться к этому величайшему испытанию веры.</p>
+                
+                <div class="key-points">
+                    <div class="point-card">
+                        <h3>Испытание религией</h3>
+                        <p>Даджаль попытается забрать у нас нашу религию, утверждая, что он является Богом.</p>
+                    </div>
+                    
+                    <div class="point-card">
+                        <h3>Два смысла Даджаля</h3>
+                        <p>Первое - само существо, второе - фитна (смута), которую он принесет.</p>
+                    </div>
+                    
+                    <div class="point-card">
+                        <h3>Множество даджалей</h3>
+                        <p>Пророк предупредил, что придет много лжецов, пытающихся отнять религию.</p>
+                    </div>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="4">00:04</span>
+                    <p class="transcript-text">Когда Даджаль явится, мы будем испытаны четырьмя испытаниями.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="7">00:07</span>
+                    <p class="transcript-text">Он попытается забрать у нас нашу религию. Это будет испытание религией.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="14">00:14</span>
+                    <p class="transcript-text">Он заявит, что является Богом и что нам нужно принять Его как божество. Такое будет испытание.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="19">00:19</span>
+                    <p class="transcript-text">У слова Даджаль два смысла. Первое - само существо, известное нам под этим именем Даджаль. Второе - это фитна, смута Даджаля.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="40">00:40</span>
+                    <p class="transcript-text">Мы предупреждены, что Даджаль использует силы, которые будут его неотъемлемой частью, и все, что так или иначе с ними связано, также относится к испытанию Даджалем.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="48">00:48</span>
+                    <p class="transcript-text">Возможно, эти силы не будут представлены им лично, но будут составной его частью, и это также часть испытания. Так что любого, кто пытается отнять у вас религию, можно назвать Даджалем.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="58">00:58</span>
+                    <p class="transcript-text">Поэтому Пророк صلى الله عليه وسلم сказал: Они придут к моей умме. Придет очень много даджалей.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="77">01:17</span>
+                    <p class="transcript-text">Слово даджаль переводится как лжец. Те, кто хотят забрать у вас вашу религию.</p>
+                </div>
+                
+                <div class="transcript-item">
+                    <span class="timestamp" data-time="86">01:26</span>
+                    <p class="transcript-text">Пророк صلى الله عليه وسلم сказал: Придут люди, которые будут утверждать, что они пророки.</p>
+                </div>
+                
+                <div class="arabic-text">
+                    قَالَ رَسُولُ اللَّهِ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ: لاَ تَقُومُ السَّاعَةُ حَتَّى يُبْعَثَ دَجَّالُونَ كَذَّابُونَ قَرِيبٌ مِنْ ثَلاَثِينَ كُلُّهُمْ يَزْعُمُ أَنَّهُ رَسُولُ اللَّهِ
+                </div>
+                <div class="translation">
+                    "Посланник Аллаха (мир ему и благословение) сказал: "Не наступит Час, пока не будут посланы лжецы-обманщики, близкие к тридцати, каждый из которых будет утверждать, что он посланник Аллаха"."
+                </div>
+                
+                <div class="warning-box">
+                    <div class="warning-title">ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ</div>
+                    <p>Знание о Даджале и его испытаниях должно укреплять нашу веру и побуждать к большей осознанности в религии. Мусульманин должен изучать свою религию, следовать Корану и Сунне, чтобы быть защищенным от любых испытаний, включая фитну Даджаля.</p>
+                    <p>Запомните: лучшая защита - это крепкая вера, знание и соблюдение религиозных предписаний.</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Даджаль - Величайшее испытание человечества</p>
+            <p>© 2025 создано - Истина о Лжемессии</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('dajjalVideo');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const captionsBtn = document.getElementById('captionsBtn');
+            const videoContainer = document.querySelector('.video-container');
+            const timestamps = document.querySelectorAll('.timestamp');
+            
+            // Управление громкостью
+            volumeSlider.addEventListener('input', function() {
+                video.volume = volumeSlider.value;
+            });
+            
+            // Полноэкранный режим
+            fullscreenBtn.addEventListener('click', function() {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    video.msRequestFullscreen();
+                } else if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) {
+                    videoContainer.msRequestFullscreen();
+                }
+            });
+            
+            // Перемотка по таймкодам
+            timestamps.forEach(timestamp => {
+                timestamp.addEventListener('click', function() {
+                    const time = parseFloat(this.getAttribute('data-time'));
+                    video.currentTime = time;
+                    video.play();
+                    
+                    // Подсветка активного таймкода
+                    timestamps.forEach(ts => ts.style.background = 'var(--primary)');
+                    this.style.background = 'var(--danger)';
+                });
+            });
+            
+            // Обновление активного таймкода во время воспроизведения
+            video.addEventListener('timeupdate', function() {
+                const currentTime = video.currentTime;
+                
+                timestamps.forEach(timestamp => {
+                    const timestampTime = parseFloat(timestamp.getAttribute('data-time'));
+                    if (currentTime >= timestampTime && currentTime < timestampTime + 5) {
+                        timestamp.style.background = 'var(--danger)';
+                    } else {
+                        timestamp.style.background = 'var(--primary)';
+                    }
+                });
+            });
+            
+            // Автоматическая установка громкости при загрузке
+            video.volume = volumeSlider.value;
+            
+            // Сохранение позиции просмотра при перезагрузке
+            video.addEventListener('timeupdate', function() {
+                localStorage.setItem('dajjalVideoTime', video.currentTime);
+            });
+            
+            // Восстановление позиции просмотра
+            const savedTime = localStorage.getItem('dajjalVideoTime');
+            if (savedTime) {
+                video.addEventListener('loadedmetadata', function() {
+                    video.currentTime = parseFloat(savedTime);
+                });
+            }
+            
+            // Управление субтитрами
+            captionsBtn.addEventListener('click', function() {
+                if (video.textTracks.length > 0) {
+                    const track = video.textTracks[0];
+                    track.mode = track.mode === 'showing' ? 'hidden' : 'showing';
+                    this.textContent = track.mode === 'showing' ? 'Скрыть субтитры' : 'Субтитры';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

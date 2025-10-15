@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Даджаль - Величайшее испытание человечества</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0a0a14;
+            --light-bg: #f8f5e9;
+            --dark-text: #e9e2d0;
+            --light-text: #2c2c2c;
+            --accent: #c9a96e;
+            --accent-light: #d4b887;
+            --danger: #b40000;
+            --danger-light: #d9534f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Scheherazade New', serif;
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Видео-оверлей */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1.5s ease;
+            padding: 15px;
+        }
+
+        .video-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            height: 50vh;
+            max-height: 500px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(180, 0, 0, 0.5);
+            cursor: pointer;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            gap: 15px;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+        }
+
+        .volume-slider {
+            width: 100px;
+        }
+
+        .video-title {
+            font-family: 'Amiri', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--danger);
+            margin: 1.5rem 0;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(180, 0, 0, 0.5);
+        }
+
+        .video-story {
+            max-width: 800px;
+            text-align: center;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+            line-height: 1.8;
+        }
+
+        .continue-prompt {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            color: var(--danger);
+            animation: pulse 2s infinite;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        header {
+            padding: 1.5rem 0;
+            text-align: center;
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(5px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(180, 0, 0, 0.3);
+        }
+
+        .logo {
+            font-family: 'Amiri', serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            margin-bottom: 0.5rem;
+            color: var(--danger);
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        nav {
+            margin: 1.5rem 0 0;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: var(--dark-text);
+            text-decoration: none;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--danger);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--danger);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(rgba(10, 10, 20, 0.9), rgba(10, 10, 20, 0.95)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="%23b40000" opacity="0.05"/></svg>');
+            background-size: cover;
+            border-bottom: 1px solid rgba(180, 0, 0, 0.2);
+        }
+
+        .hero h1 {
+            font-family: 'Amiri', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: var(--danger);
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--danger);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+
+        .btn:hover {
+            background-color: var(--danger-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(180, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(180, 0, 0, 0.1);
+        }
+
+        .btn-video {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: 2px solid #ff9ff3;
+        }
+
+        .btn-video:hover {
+            background: linear-gradient(135deg, #ff5252, #ff3838);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .content-section {
+            padding: 3rem 0;
+        }
+
+        .section-title {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: var(--danger);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background-color: var(--danger);
+            margin: 0.5rem auto;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(180, 0, 0, 0.2);
+            border-color: rgba(180, 0, 0, 0.4);
+        }
+
+        .card h3 {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.4rem, 3vw, 1.8rem);
+            margin-bottom: 1rem;
+            color: var(--danger);
+        }
+
+        .card p {
+            margin-bottom: 1rem;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.3rem, 3vw, 2rem);
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--danger);
+            line-height: 1.8;
+            padding: 1.2rem;
+            background: rgba(180, 0, 0, 0.05);
+            border-radius: 8px;
+            border-right: 3px solid var(--danger);
+        }
+
+        .translation {
+            font-style: italic;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+        }
+
+        .warning-box {
+            background: rgba(180, 0, 0, 0.1);
+            border: 2px solid rgba(180, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-title {
+            color: var(--danger);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            text-align: center;
+        }
+
+        .protection-section {
+            background: rgba(180, 0, 0, 0.05);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+
+        .protection-list {
+            list-style: none;
+            margin-top: 1.2rem;
+        }
+
+        .protection-list li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.8rem;
+            position: relative;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+        }
+
+        .protection-list li::before {
+            content: '•';
+            color: var(--danger);
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+        }
+
+        .signs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .sign-item {
+            background: rgba(180, 0, 0, 0.05);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--danger);
+        }
+
+        .sign-item h4 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 2.5rem auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--danger);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2.5rem;
+            width: 100%;
+            padding-left: 50px;
+        }
+
+        .timeline-content {
+            background: rgba(180, 0, 0, 0.05);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(180, 0, 0, 0.2);
+        }
+
+        .timeline-content h4 {
+            color: var(--danger);
+            margin-bottom: 0.5rem;
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.5rem 0;
+            margin-top: 2.5rem;
+            border-top: 1px solid rgba(180, 0, 0, 0.3);
+            background: rgba(10, 10, 20, 0.9);
+        }
+
+        /* Мобильное меню */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--dark-text);
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Адаптивные стили */
+        @media (max-width: 768px) {
+            .video-container {
+                height: 40vh;
+            }
+            
+            .video-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                display: none;
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+                margin: 0 auto;
+            }
+            
+            .protection-section {
+                padding: 1.5rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .video-container {
+                height: 35vh;
+            }
+            
+            .video-title {
+                margin: 1rem 0;
+            }
+            
+            .video-story {
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero {
+                padding: 2rem 0;
+            }
+            
+            .content-section {
+                padding: 2rem 0;
+            }
+            
+            .section-title {
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Видео-оверлей -->
+    <div class="video-overlay" id="videoOverlay">
+        <h1 class="video-title">الدَّجَّال</h1>
+        
+        <div class="video-container" id="videoContainer">
+            <video id="introVideo" autoplay muted loop>
+                <source src="./o0sCIDAEREdAdS9NKUIQEQzloytfhD9LBgkewL.mp4" type="video/mp4">
+                Ваш браузер не поддерживает видео.
+            </video>
+            <div class="continue-prompt">Нажмите на экран, чтобы узнать о Даджале</div>
+        </div>
+        
+        <div class="video-controls">
+            <div class="volume-control">
+                <span>Громкость:</span>
+                <input type="range" min="0" max="1" step="0.1" value="0.5" class="volume-slider" id="volumeSlider">
+            </div>
+            <button class="btn" id="toggleSound">Включить звук</button>
+        </div>
+        
+        <div class="video-story">
+            <p>Даджаль - величайшее испытание, которое предстоит пройти человечеству перед Концом Света. Лжемессия, чьи искушения будут столь сильны, что многие верующие собьются с пути.</p>
+            <p>Узнайте правду о Даджале, его признаках и о том, как защитить себя и свою веру от его фитны.</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">الدَّجَّال</div>
+            <div class="subtitle">Лжемессия - Величайшее испытание человечества</div>
+            
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
+            
+            <nav>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#about">Кто такой Даджаль?</a></li>
+                    <li><a href="#signs">Признаки</a></li>
+                    <li><a href="#protection">Защита</a></li>
+                    <li><a href="#history">Пророчества</a></li>
+                    <li><a href="#facts">Факты</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <section class="hero">
+            <h1>Даджаль: Истина о Лжемессии</h1>
+            <p>Самое страшное испытание, которое предсказал Пророк Мухаммад (мир ему и благословение). Узнайте, как распознать Даджаля и защитить свою веру.</p>
+            
+            <div class="hero-buttons">
+                <a href="#about" class="btn">
+                    📖 Узнать правду
+                </a>
+                <a href="./video.html" target="_blank" class="btn btn-video">
+                    ▶️ Смотреть видео
+                </a>
+            </div>
+        </section>
+        
+        <section class="content-section" id="about">
+            <h2 class="section-title">Кто такой Даджаль?</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Происхождение</h3>
+                    <p>Даджаль (المسيح الدجّال) - "Лжемессия", который появится перед Концом Света. Его имя означает "обманщик", "лжец". Это человек из числа сынов Адама, которому Аллах позволит творить удивительные вещи для испытания людей.</p>
+                    <p>Пророк Мухаммад (мир ему и благословение) сказал: "Не было ни одного пророка, который не предостерегал бы свой народ от лжеца-одноглазого. Поистине, он одноглазый, а ваш Господь не является одноглазым!"</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Внешность Даджаля</h3>
+                    <p>Согласно хадисам, Даджаль имеет особые приметы:</p>
+                    <ul class="protection-list">
+                        <li>Молодой человек с красноватой кожей</li>
+                        <li>Курчавые волосы</li>
+                        <li>Одноглазый (правый глаз поврежден)</li>
+                        <li>Между глаз написано "كَافِر" (неверующий)</li>
+                        <li>Широкогрудый, коренастый</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <div class="warning-title">ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ</div>
+                <p>Пророк Мухаммад (мир ему и благословение) сказал: "Поистине, с момента создания Адама не было более серьёзного дела, чем дело Даджаля". Каждый мусульманин должен знать о Даджале и способах защиты от его фитны.</p>
+            </div>
+        </section>
+        
+        <section class="content-section" id="signs">
+            <h2 class="section-title">Признаки и способности Даджаля</h2>
+            
+            <div class="card">
+                <h3>Ложные чудеса Даджаля</h3>
+                <p>Аллах даст Даджалю способности, которые будут поражать людей, но это будет испытанием:</p>
+                
+                <div class="signs-grid">
+                    <div class="sign-item">
+                        <h4>Воскрешение мёртвых</h4>
+                        <p>Будет показывать людям, что воскрешает мёртвых, но на самом деле это будет иллюзия.</p>
+                    </div>
+                    
+                    <div class="sign-item">
+                        <h4>Контроль над природой</h4>
+                        <p>Прикажет небу - и пойдет дождь, земле - и вырастут растения.</p>
+                    </div>
+                    
+                    <div class="sign-item">
+                        <h4>Ложный Рай и Ад</h4>
+                        <p>С ним будет то, что он назовет Раем и Адом, но его Рай будет Адом, а Ад - Раем.</p>
+                    </div>
+                    
+                    <div class="sign-item">
+                        <h4>Быстрое перемещение</h4>
+                        <p>Будет передвигаться по земле с огромной скоростью, "как дождь, гонимый ветром".</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="arabic-text">
+                وَيَسْأَلُونَكَ عَنِ السَّاعَةِ أَيَّانَ مُرْسَاهَا ۖ قُلْ إِنَّمَا عِلْمُهَا عِندَ رَبِّي ۖ لَا يُجَلِّيهَا لِوَقْتِهَا إِلَّا هُوَ ۚ ثَقُلَتْ فِي السَّمَاوَاتِ وَالْأَرْضِ ۚ لَا تَأْتِيكُمْ إِلَّا بَغْتَةً ۗ يَسْأَلُونَكَ كَأَنَّكَ حَفِيٌّ عَنْهَا ۖ قُلْ إِنَّمَا عِلْمُهَا عِندَ اللَّهِ وَلَٰكِنَّ أَكْثَرَ النَّاسِ لَا يَعْلَمُونَ
+            </div>
+            <div class="translation">
+                "Тебя спрашивают о Часе: 'Когда он наступит?' Скажи: 'Ведение о нем - у моего Господа. Никто, кроме Него, не откроет его в свое время. Тяжко он для небес и земли. Он наступит внезапно'. Тебя спрашивают, словно ты осведомлен о нем. Скажи: 'Ведение о нем - у Аллаха, но большая часть людей не знает'" (Коран, 7:187)
+            </div>
+        </section>
+        
+        <section class="content-section" id="protection">
+            <h2 class="section-title">Как защититься от Даджаля</h2>
+            
+            <div class="card">
+                <h3>Средства защиты согласно Сунне</h3>
+                <p>Пророк Мухаммад (мир ему и благословение) дал мусульманам конкретные указания по защите от искушений Даджаля:</p>
+                
+                <div class="protection-section">
+                    <h3>Основные средства защиты:</h3>
+                    <ul class="protection-list">
+                        <li><strong>Запомнить первые 10 аятов суры "Аль-Кахф"</strong> - это защитит от фитны Даджаля</li>
+                        <li><strong>Чтение последних двух аятов суры "Аль-Кахф"</strong></li>
+                        <li><strong>Произнесение защитных дуа</strong> - особенно в намазе после ташаххуда</li>
+                        <li><strong>Укрепление веры и знания</strong> - сильная вера защитит от искушений</li>
+                        <li><strong>Избегание сомнительных мест</strong> - где может появиться Даджаль</li>
+                        <li><strong>Следование Корану и Сунне</strong> - это лучшая защита</li>
+                        <li><strong>Пребывание в Мекке или Медине</strong> - Даджаль не сможет войти в эти города</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Защитное дуа от Даджаля</h3>
+                    <div class="arabic-text">
+                        اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ وَمِنْ عَذَابِ جَهَنَّمَ وَمِنْ فِتْنَةِ الْمَحْيَا وَالْمَمَاتِ وَمِنْ شَرِّ فِتْنَةِ الْمَسِيحِ الدَّجَّالِ
+                    </div>
+                    <div class="translation">
+                        "О Аллах, поистине, я прибегаю к Тебе от мучений могилы, и от мучений Ада, и от искушений жизни и смерти, и от зла искушения Аль-Масиха Ad-Даджаля!"
+                    </div>
+                    <p><strong>Когда читать:</strong> В каждом намазе после ташаххуда</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Сура Аль-Кахф</h3>
+                    <p>Пророк (мир ему и благословение) сказал: "Кто прочтет десять аятов из суры 'Пещера', тот будет защищен от Даджаля".</p>
+                    <p>Особую защиту дают первые 10 аятов и последние 10 аятов этой суры.</p>
+                    <div class="arabic-text">
+                        الْحَمْدُ لِلَّهِ الَّذِي أَنْزَلَ عَلَىٰ عَبْدِهِ الْكِتَابَ وَلَمْ يَجْعَلْ لَهُ عِوَجًا
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="content-section" id="history">
+            <h2 class="section-title">Пророчества о Даджале</h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>Пророчество Пророка Мухаммада</h4>
+                        <p>"Не будет ни одного пророка, который не предостерегал бы свою ummah от одноглазого лжеца. Поистине, он одноглазый, а ваш Господь не является одноглазым, и между его глаз будет написано 'kafir'".</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>Место появления</h4>
+                        <p>Даджаль появится из Хорасана (восточный регион) и будет следовать за ним 70 000 евреев Исфахана, одетых в персидские одеяния.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>Продолжительность правления</h4>
+                        <p>Даджаль будет находиться на земле 40 дней: первый день как год, второй как месяц, третий как неделя, а остальные дни как обычные дни.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h4>Конец Даджаля</h4>
+                        <p>Даджаль будет убит Исой (Иисусом), сыном Марьям, у ворот Людд (Лод) в Палестине. Иса пронзит его копьем, и он умрет.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="content-section" id="facts">
+            <h2 class="section-title">Факты о Даджале</h2>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Даджаль не является Аллахом</h3>
+                    <p>Даджаль будет утверждать, что он бог, но мусульмане должны знать, что:</p>
+                    <ul class="protection-list">
+                        <li>Аллах не является одноглазым</li>
+                        <li>Даджаль - создание Аллаха</li>
+                        <li>Он будет убит пророком Исой</li>
+                        <li>Его могущество ограничено и дано Аллахом как испытание</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Кто увидит Даджаля</h3>
+                    <p>Согласно хадисам, Даджаля увидят все люди, кроме:</p>
+                    <ul class="protection-list">
+                        <li>Истинно верующих, которые умрут до его появления</li>
+                        <li>Жителей Мекки и Медины (он не сможет войти в эти города)</li>
+                        <li>Некоторых мучеников за веру</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Защита для детей</h3>
+                    <p>Родителям рекомендуется:</p>
+                    <ul class="protection-list">
+                        <li>Обучать детей основам веры с раннего возраста</li>
+                        <li>Учить их суре "Аль-Кахф"</li>
+                        <li>Объяснять признаки Даджаля</li>
+                        <li>Прививать любовь к Корану и Сунне</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Современные признаки</h3>
+                    <p>Некоторые ученые указывают на современные явления как на малые признаки приближения Даджаля:</p>
+                    <ul class="protection-list">
+                        <li>Распространение невежества об исламе</li>
+                        <li>Учащение землетрясений</li>
+                        <li>Исчезновение знания и распространение невежества</li>
+                        <li>Учащение убийств и беспорядков</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <div class="warning-title">ЗАКЛЮЧЕНИЕ</div>
+                <p>Знание о Даджале - это не повод для страха, а повод для укрепления веры и подготовки. Мусульманин должен укреплять свою веру, изучать религию и следовать Корану и Сунне - это лучшая защита от любых испытаний, включая фитну Даджаля.</p>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Даджаль - Величайшее испытание человечества</p>
+            <p>© 2025 создано    - Истина о Лжемессии</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoOverlay = document.getElementById('videoOverlay');
+            const videoContainer = document.getElementById('videoContainer');
+            const introVideo = document.getElementById('introVideo');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const toggleSoundBtn = document.getElementById('toggleSound');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const navLinks = document.getElementById('navLinks');
+            
+            // Управление звуком видео
+            let soundEnabled = false;
+            
+            toggleSoundBtn.addEventListener('click', function() {
+                soundEnabled = !soundEnabled;
+                introVideo.muted = !soundEnabled;
+                toggleSoundBtn.textContent = soundEnabled ? 'Выключить звук' : 'Включить звук';
+                
+                if (soundEnabled) {
+                    introVideo.volume = volumeSlider.value;
+                    // Попытка воспроизведения после включения звука
+                    introVideo.play().catch(e => {
+                        console.log("Автовоспроизведение с звуком заблокировано браузером");
+                    });
+                }
+            });
+            
+            volumeSlider.addEventListener('input', function() {
+                if (soundEnabled) {
+                    introVideo.volume = volumeSlider.value;
+                }
+            });
+            
+            // Обработчик для закрытия видео-оверлея при клике на видео
+            videoContainer.addEventListener('click', function() {
+                videoOverlay.classList.add('hidden');
+                introVideo.pause();
+            });
+            
+            // Обработчик для закрытия видео-оверлея при клике на оверлей
+            videoOverlay.addEventListener('click', function(e) {
+                if (e.target === videoOverlay) {
+                    videoOverlay.classList.add('hidden');
+                    introVideo.pause();
+                }
+            });
+            
+            // Мобильное меню
+            mobileMenuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+            });
+            
+            // Закрытие меню при клике на ссылку
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                });
+            });
+            
+            // Плавная прокрутка для навигационных ссылок
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+
+            // Улучшенная функциональность для кнопки "Смотреть видео"
+            const watchVideoBtn = document.querySelector('.btn-video');
+            
+            if (watchVideoBtn) {
+                watchVideoBtn.addEventListener('click', function(e) {
+                    // Можно добавить дополнительную логику перед переходом
+                    console.log('Переход к видео о Даджале...');
+                    
+                    // Открываем в новой вкладке
+                    window.open(this.href, '_blank');
+                    
+                    // Предотвращаем стандартное поведение, если нужно
+                    e.preventDefault();
+                });
+            }
+
+            // Добавляем анимацию появления элементов при прокрутке
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Наблюдаем за карточками и другими элементами
+            document.querySelectorAll('.card, .timeline-item, .sign-item').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>
